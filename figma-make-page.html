@@ -375,28 +375,28 @@
       <div class="review-content">
         <p class="review-subtitle">검토 결과 요약</p>
 
-        <div class="review-item">
+        <div class="review-risk">
           <strong>① 위험 요소:</strong>
           <span class="value">이미지를 업로드하면 AI가 자동으로 검토 결과를 제공합니다.</span>
         </div>
 
-        <div class="review-item">
+        <div class="review-misunderstanding">
           <strong>② 오해 소지:</strong>
           <span class="value">이미지를 첨부해주세요.</span>
         </div>
 
-        <div class="review-item">
-          <strong>문제 유형:</strong>
+        <div class="review-type">
+          <strong>③ 문제 유형:</strong>
           <span class="value">분석 전</span>
         </div>
 
-        <div class="review-item">
-          <strong>회사 키비주얼 사용 적합성:</strong>
+        <div class="review-fit">
+          <strong>④ 회사 키비주얼 사용 적합성:</strong>
           <span class="fit-badge">분석 전</span>
         </div>
 
         <div class="review-item">
-          <strong>수정 또는 재생성 권고 사항:</strong>
+          <strong>⑤ 수정 또는 재생성 권고 사항:</strong>
           <p class="recommendation">AI 분석 결과가 이곳에 표시됩니다.</p>
         </div>
 
@@ -408,13 +408,18 @@
         </div>
       </div>
       <script>
-        // 검토 결과 케이스 예시 (CASE 01: 성별 대립 구도)
+        // 검토 결과 케이스 예시 (CASE 01: 성별 대립 구도) - 결과값(표준) md 기준
         const aiResult = {
+          // 표준 결과값 필드명에 맞게 정확히 매핑
           위험요소: "있음 — 남 vs 여 대립 구도가 명확하여 갈등을 직접적으로 유발할 수 있음",
           오해소지: "높음",
           문제유형: "젠더 갈등 / 성별 대립",
-          커버적합: "부적합",
-          권고: "성별 간 대치 구도 제거(분할/번개/손가락질/공격 제스처 삭제), 협업/중립 상황으로 재구성(동일 목표, 같은 방향 시선), 인물 대신 추상 아이콘/그래픽으로 대체"
+          회사키비주얼사용적합성: "부적합",
+          수정또는재생성권고사항: [
+            "성별 간 대치 구도 제거(분할/번개/손가락질/공격 제스처 삭제)",
+            "협업/중립 상황으로 재구성(동일 목표, 같은 방향 시선)",
+            "인물 대신 추상 아이콘/그래픽으로 대체"
+          ].join(", ")
         };
 
         // 실제로는 AI 분석 후 콜백으로 실행, 예시로 'DOMContentLoaded' 후 버튼에 이벤트 연결
@@ -422,22 +427,21 @@
           const generateBtn = document.querySelector('.btn-generate');
           // review 영역 내 각 요소 참조
           const reviewRoot = document.querySelector('.review-content');
+          // 더 명확하게 매칭을 위해 각 review-item마다 별도의 고유 class를 추가한다고 가정
           const resultMap = {
-            위험요소: reviewRoot.querySelector(".review-item:nth-child(3) .value"),
-            오해소지: reviewRoot.querySelector(".review-item:nth-child(4) .value"),
-            문제유형: reviewRoot.querySelector(".review-item:nth-child(5) .value"),
-            커버적합: reviewRoot.querySelector(".review-item:nth-child(6) .fit-badge"),
-            권고: reviewRoot.querySelector(".recommendation"),
-            안내: reviewRoot.querySelector(".warning-box p")
+            위험요소: reviewRoot.querySelector(".review-risk .value"),
+            오해소지: reviewRoot.querySelector(".review-misunderstanding .value"),
+            문제유형: reviewRoot.querySelector(".review-type .value"),
+            회사키비주얼사용적합성: reviewRoot.querySelector(".review-fit .fit-badge"),
+            수정또는재생성권고사항: reviewRoot.querySelector(".review-item .recommendation"),
           };
 
           generateBtn && generateBtn.addEventListener('click', () => {
             resultMap.위험요소.textContent = aiResult.위험요소;
             resultMap.오해소지.textContent = aiResult.오해소지;
             resultMap.문제유형.textContent = aiResult.문제유형;
-            resultMap.커버적합.textContent = aiResult.커버적합;
-            resultMap.권고.textContent = aiResult.권고;
-            resultMap.안내.innerHTML = "<strong>▲ 안내:</strong> AI 리뷰 결과가 위에 표시되었습니다.";
+            resultMap.회사키비주얼사용적합성.textContent = aiResult.커버적합;
+            resultMap.수정또는재생성권고사항.textContent = aiResult.권고;
           });
         });
       </script>
