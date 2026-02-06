@@ -1,0 +1,551 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Figma Make - AI Review</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+      background: #f5f5f5;
+      min-height: 100vh;
+      color: #1a1a1a;
+    }
+
+    /* 상단 바 */
+    .header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 16px 24px;
+      background: #fff;
+      border-bottom: 1px solid #e5e5e5;
+    }
+
+    .logo {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      font-size: 18px;
+      font-weight: 600;
+      color: #1a1a1a;
+    }
+
+    .logo-icon {
+      width: 28px;
+      height: 28px;
+      background: linear-gradient(135deg, #7c3aed 0%, #a78bfa 100%);
+      clip-path: polygon(50% 0%, 100% 25%, 100% 75%, 50% 100%, 0% 75%, 0% 25%);
+    }
+
+    .header-actions {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 10px 18px;
+      border: none;
+      border-radius: 8px;
+      font-size: 14px;
+      font-weight: 500;
+      cursor: pointer;
+      font-family: inherit;
+    }
+
+    .btn-generate {
+      background: #2563eb;
+      color: #fff;
+    }
+
+    .btn-generate:hover {
+      background: #1d4ed8;
+    }
+
+    .btn-approve {
+      background: #16a34a;
+      color: #fff;
+    }
+
+    .btn-approve:hover {
+      background: #15803d;
+    }
+
+    .btn svg {
+      width: 16px;
+      height: 16px;
+    }
+
+    /* 메인 레이아웃 */
+    .main {
+      display: flex;
+      gap: 24px;
+      padding: 24px;
+      max-width: 1200px;
+      margin: 0 auto;
+    }
+
+    /* 카드 공통 */
+    .card {
+      background: #fff;
+      border-radius: 12px;
+      border: 1px solid #e5e5e5;
+      overflow: hidden;
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+    }
+
+    /* 좌측: 업로드 이미지 */
+    .card-upload {
+      max-width: 400px;
+    }
+
+    .card-header {
+      padding: 20px 20px 16px;
+      border-bottom: 1px solid #f0f0f0;
+      font-size: 16px;
+      font-weight: 600;
+    }
+
+    .upload-area {
+      flex: 1;
+      min-height: 320px;
+      margin: 20px;
+      border: 2px dashed #d4d4d4;
+      border-radius: 8px;
+      background: #fafafa;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: #737373;
+    }
+
+    .upload-placeholder {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .upload-placeholder svg {
+      width: 48px;
+      height: 48px;
+      color: #a3a3a3;
+    }
+
+    /* 우측: AI 검토 결과 */
+    .card-review {
+      min-width: 0;
+    }
+
+    .card-review .card-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .close-btn {
+      width: 32px;
+      height: 32px;
+      border: none;
+      background: transparent;
+      border-radius: 6px;
+      cursor: pointer;
+      color: #737373;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .close-btn:hover {
+      background: #f0f0f0;
+      color: #1a1a1a;
+    }
+
+    .review-content {
+      padding: 20px;
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+    }
+
+    .review-subtitle {
+      font-size: 14px;
+      font-weight: 600;
+      color: #525252;
+      margin-bottom: 4px;
+    }
+
+    .review-item {
+      font-size: 14px;
+      line-height: 1.5;
+    }
+
+    .review-item strong {
+      color: #1a1a1a;
+    }
+
+    .review-item .value {
+      color: #404040;
+    }
+
+    .fit-badge {
+      display: inline-block;
+      padding: 6px 12px;
+      border-radius: 6px;
+      font-size: 14px;
+      font-weight: 600;
+      background: #dc2626;
+      color: #fff;
+    }
+
+    .recommendation {
+      font-size: 14px;
+      line-height: 1.6;
+      color: #404040;
+    }
+
+    .warning-box {
+      display: flex;
+      align-items: flex-start;
+      gap: 12px;
+      padding: 16px;
+      background: #fef2f2;
+      border: 1px solid #fecaca;
+      border-radius: 8px;
+      margin-top: 8px;
+    }
+
+    .warning-box svg {
+      flex-shrink: 0;
+      width: 20px;
+      height: 20px;
+      color: #dc2626;
+    }
+
+    .warning-box p {
+      font-size: 14px;
+      font-weight: 500;
+      color: #1a1a1a;
+      line-height: 1.5;
+    }
+
+    .btn-generate:disabled {
+      opacity: 0.7;
+      cursor: not-allowed;
+    }
+
+    .review-loading {
+      padding: 24px;
+      text-align: center;
+      color: #737373;
+    }
+
+    .review-loading .spinner {
+      width: 32px;
+      height: 32px;
+      margin: 0 auto 12px;
+      border: 3px solid #e5e5e5;
+      border-top-color: #2563eb;
+      border-radius: 50%;
+      animation: spin 0.8s linear infinite;
+    }
+
+    @keyframes spin {
+      to { transform: rotate(360deg); }
+    }
+
+    .criteria-note {
+      font-size: 12px;
+      color: #737373;
+      margin-top: 16px;
+      padding-top: 16px;
+      border-top: 1px solid #f0f0f0;
+    }
+  </style>
+</head>
+<body>
+  <!-- 검토결과요약.md 내용 (Generate Again 시 사용) -->
+  <script type="text/plain" id="review-prompt-md">
+# Image Review Prompt – 검토결과 요약 생성
+
+## 역할 정의
+너는 기업 채용·브랜드 키비주얼을 검토하는
+**이미지 리스크 리뷰 AI**다.
+
+업로드된 이미지를 기준으로
+젠더 갈등, 혐오, 조롱, 오해 소지가 있는지
+객관적이고 중립적으로 판단해야 한다.
+
+---
+
+## 검토 기준
+다음 항목을 반드시 고려하여 이미지를 분석하라.
+
+1. 특정 성별을 일반화·비하·조롱하는 시각적 표현이 있는가
+2. 남성 또는 여성이
+   - 위협적
+   - 무능
+   - 희화화된 존재로 고정 표현되어 있는가
+3. 성별 간 대립(남 vs 여), 위계, 갈등 구도가 시각적으로 존재하는가
+4. 온라인 커뮤니티(여혐·남혐 맥락)에서
+   혐오 이미지나 상징으로 소비될 가능성이 있는가
+5. 기업·채용 브랜드 이미지 관점에서
+   논란 또는 오해를 유발할 위험이 있는가
+
+---
+
+## 출력 형식 (⚠️ 반드시 이 형식을 유지할 것)
+
+### 검토 결과 요약
+
+- 🔴 **위험 요소**: 있음 / 없음  
+  - (있다면 구체적인 시각 요소 설명)
+
+- 🟡 **오해 소지**: 낮음 / 중간 / 높음  
+
+- 🧩 **문제 유형**  
+  - (예: 성별 일반화 / 젠더 갈등 / 혐오 상징 연상 / 언캐니·조롱 표현 등)
+
+- 🏢 **회사 키비주얼 사용 적합성**  
+  - 적합 / 조건부 가능 / 부적합  
+
+- ✏️ **수정 또는 재생성 권고 사항**  
+  - (실무자가 바로 이해할 수 있도록 구체적으로 제안)
+
+---
+
+## 작성 톤 가이드
+- 감정적 표현 사용 금지
+- 특정 집단을 단정하거나 비난하지 말 것
+- "가능성", "오해 소지", "연상될 수 있음"과 같은
+  **리스크 중심 표현**을 사용할 것
+- 회사 내부 검토 문서에 그대로 사용 가능한 톤으로 작성할 것
+  </script>
+
+  <header class="header">
+    <div class="logo">
+      <div class="logo-icon"></div>
+      <span>Figma Make</span>
+    </div>
+    <div class="header-actions">
+      <button type="button" class="btn btn-generate" id="btn-generate">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <path d="M5 12h14M12 5l7 7-7 7"/>
+        </svg>
+        Generate Again
+      </button>
+      <button type="button" class="btn btn-approve">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <path d="M20 6L9 17l-5-5"/>
+        </svg>
+        Approve
+      </button>
+    </div>
+  </header>
+
+  <main class="main">
+    <section class="card card-upload">
+      <h2 class="card-header">Uploaded Image</h2>
+      <div class="upload-area">
+        <div class="upload-placeholder">
+          <input type="file" id="image-upload" accept="image/*" style="display:none" />
+          <label for="image-upload" style="cursor:pointer; display:flex; flex-direction:column; align-items:center;">
+            <svg id="upload-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" style="width:40px;height:40px;">
+              <rect x="3" y="3" width="18" height="18" rx="2"/>
+              <circle cx="8.5" cy="8.5" r="1.5"/>
+              <path d="M21 15l-5-5L5 21"/>
+            </svg>
+            <span id="upload-text" style="fonr-align: center; margin-top: 8px;" ><u>이미지 첨부하기</u></span>
+            <img id="preview-image" src="" alt="미리보기" style="display:none;margin-top:8px;max-width:160px;border-radius:8px;border:1px solid #e5e7eb;" />
+          </label>
+          <script>
+            const input = document.getElementById('image-upload');
+            const preview = document.getElementById('preview-image');
+            const text = document.getElementById('upload-text');
+            const icon = document.getElementById('upload-icon');
+
+            input.addEventListener('change', (e) => {
+              const file = e.target.files[0];
+              if (file && file.type.startsWith('image/')) {
+                const reader = new FileReader();
+                reader.onload = function(ev) {
+                  preview.src = ev.target.result;
+                  preview.style.display = 'block';
+                  text.innerHTML = '이미지가 업로드되었습니다';
+                  icon.style.display = 'none';
+                }
+                reader.readAsDataURL(file);
+              }
+            });
+          </script>
+        </div>
+      </div>
+    </section>
+
+    <section class="card card-review">
+      <div class="card-header">
+        <h2>AI Review Results</h2>
+        <button type="button" class="close-btn" aria-label="닫기">
+          <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M18 6L6 18M6 6l12 12"/>
+          </svg>
+        </button>
+      </div>
+      <div class="review-content" id="review-content">
+        <p class="review-subtitle">검토 결과 요약</p>
+
+        <div class="review-item" data-field="risk">
+          <strong>① 위험 요소:</strong>
+          <span class="value">있음 - "남 vs 이 대립 구도, 시료를 가누는 모습"</span>
+        </div>
+
+        <div class="review-item" data-field="misunderstanding">
+          <strong>② 오해 소지:</strong>
+          <span class="value">높음</span>
+        </div>
+
+        <div class="review-item" data-field="problemType">
+          <strong>문제 유형:</strong>
+          <span class="value">젠더 갈등 / 성별 대립</span>
+        </div>
+
+        <div class="review-item" data-field="fit">
+          <strong>회사 커버주얼 사용 적합성:</strong>
+          <span class="fit-badge">부적합</span>
+        </div>
+
+        <div class="review-item" data-field="recommendation">
+          <strong>수정 또는 재생성 권고 사항:</strong>
+          <p class="recommendation">남녀 대립 구도를 피하고 중립적, 협력하는 분위기로 수정 권장.</p>
+        </div>
+
+        <div class="warning-box" data-field="warning">
+          <svg viewBox="0 0 24 24" fill="currentColor">
+            <path d="M12 2L1 21h22L12 2zm0 3.99L19.53 19H4.47L12 5.99zM11 10v4h2v-4h-2zm0 6v2h2v-2h-2z"/>
+          </svg>
+          <p><strong>▲ 주의:</strong> 성별 대립 구도로 인해 젠더 갈등을 유발할 위험이 있습니다.</p>
+        </div>
+
+        <p class="criteria-note" id="criteria-note">※ 검토결과요약.md 기준으로 생성됨</p>
+      </div>
+    </section>
+  </main>
+
+  <script>
+    (function() {
+      var promptEl = document.getElementById('review-prompt-md');
+      var btnGenerate = document.getElementById('btn-generate');
+      var reviewContent = document.getElementById('review-content');
+
+      if (!promptEl || !btnGenerate || !reviewContent) return;
+
+      var promptMd = (promptEl.textContent || promptEl.innerText || '').trim();
+
+      // MD 기준 출력 형식에 맞춘 샘플 결과 (실제로는 API/백엔드에서 이미지 분석 후 반환)
+      function getSampleResult() {
+        return {
+          risk: '있음 - "남 vs 이 대립 구도, 시료를 가누는 모습"',
+          misunderstanding: '높음',
+          problemType: '젠더 갈등 / 성별 대립',
+          fit: '부적합',
+          fitClass: 'fit-badge',
+          recommendation: '남녀 대립 구도를 피하고 중립적, 협력하는 분위기로 수정 권장.',
+          warning: '성별 대립 구도로 인해 젠더 갈등을 유발할 위험이 있습니다.'
+        };
+      }
+
+      function showLoading() {
+        var loadingHtml = ''
+          + '<p class="review-subtitle">검토 결과 요약</p>'
+          + '<div class="review-loading">'
+          + '<div class="spinner"></div>'
+          + '<p>검토결과요약.md 기준으로 이미지를 분석 중입니다...</p>'
+          + '</div>';
+        reviewContent.innerHTML = loadingHtml;
+      }
+
+      function showResult(data) {
+        var fitClass = data.fitClass || 'fit-badge';
+        reviewContent.innerHTML = ''
+          + '<p class="review-subtitle">검토 결과 요약</p>'
+          + '<div class="review-item" data-field="risk">'
+          + '<strong>① 위험 요소:</strong> <span class="value">' + escapeHtml(data.risk) + '</span>'
+          + '</div>'
+          + '<div class="review-item" data-field="misunderstanding">'
+          + '<strong>② 오해 소지:</strong> <span class="value">' + escapeHtml(data.misunderstanding) + '</span>'
+          + '</div>'
+          + '<div class="review-item" data-field="problemType">'
+          + '<strong>문제 유형:</strong> <span class="value">' + escapeHtml(data.problemType) + '</span>'
+          + '</div>'
+          + '<div class="review-item" data-field="fit">'
+          + '<strong>회사 커버주얼 사용 적합성:</strong> '
+          + '<span class="' + fitClass + '">' + escapeHtml(data.fit) + '</span>'
+          + '</div>'
+          + '<div class="review-item" data-field="recommendation">'
+          + '<strong>수정 또는 재생성 권고 사항:</strong>'
+          + '<p class="recommendation">' + escapeHtml(data.recommendation) + '</p>'
+          + '</div>'
+          + '<div class="warning-box" data-field="warning">'
+          + '<svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 2L1 21h22L12 2zm0 3.99L19.53 19H4.47L12 5.99zM11 10v4h2v-4h-2zm0 6v2h2v-2h-2z"/></svg>'
+          + '<p><strong>▲ 주의:</strong> ' + escapeHtml(data.warning) + '</p>'
+          + '</div>'
+          + '<p class="criteria-note" id="criteria-note">※ 검토결과요약.md 기준으로 생성됨</p>';
+      }
+
+      function escapeHtml(text) {
+        var div = document.createElement('div');
+        div.textContent = text;
+        return div.innerHTML;
+      }
+
+      function resetUploadArea() {
+        var input = document.getElementById('image-upload');
+        var preview = document.getElementById('preview-image');
+        var text = document.getElementById('upload-text');
+        var icon = document.getElementById('upload-icon');
+        if (input) input.value = '';
+        if (preview) {
+          preview.src = '';
+          preview.style.display = 'none';
+        }
+        if (text) text.innerHTML = '<u>이미지 첨부하기</u>';
+        if (icon) icon.style.display = 'block';
+      }
+
+      btnGenerate.addEventListener('click', function() {
+        if (btnGenerate.disabled) return;
+        if (!promptMd) {
+          alert('검토 기준(prompt)을 불러올 수 없습니다.');
+          return;
+        }
+
+        resetUploadArea();
+        btnGenerate.disabled = true;
+        showLoading();
+
+        // 검토결과요약.md 기준으로 "실행" 시뮬레이션 (실제 환경에서는 업로드 이미지 + API 호출)
+        setTimeout(function() {
+          var result = getSampleResult();
+          showResult(result);
+          btnGenerate.disabled = false;
+        }, 1200);
+      });
+    })();
+  </script>
+</body>
+</html>
