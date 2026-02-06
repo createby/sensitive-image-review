@@ -243,119 +243,85 @@
       color: #1a1a1a;
       line-height: 1.5;
     }
-
-    .btn-generate:disabled {
-      opacity: 0.7;
-      cursor: not-allowed;
-    }
-
-    .review-loading {
-      padding: 24px;
-      text-align: center;
-      color: #737373;
-    }
-
-    .review-loading .spinner {
-      width: 32px;
-      height: 32px;
-      margin: 0 auto 12px;
-      border: 3px solid #e5e5e5;
-      border-top-color: #2563eb;
-      border-radius: 50%;
-      animation: spin 0.8s linear infinite;
-    }
-
-    @keyframes spin {
-      to { transform: rotate(360deg); }
-    }
-
-    .criteria-note {
-      font-size: 12px;
-      color: #737373;
-      margin-top: 16px;
-      padding-top: 16px;
-      border-top: 1px solid #f0f0f0;
-    }
   </style>
 </head>
 <body>
-  <!-- 검토결과요약.md 내용 (Generate Again 시 사용) -->
-  <script type="text/plain" id="review-prompt-md">
-# Image Review Prompt – 검토결과 요약 생성
-
-## 역할 정의
-너는 기업 채용·브랜드 키비주얼을 검토하는
-**이미지 리스크 리뷰 AI**다.
-
-업로드된 이미지를 기준으로
-젠더 갈등, 혐오, 조롱, 오해 소지가 있는지
-객관적이고 중립적으로 판단해야 한다.
-
----
-
-## 검토 기준
-다음 항목을 반드시 고려하여 이미지를 분석하라.
-
-1. 특정 성별을 일반화·비하·조롱하는 시각적 표현이 있는가
-2. 남성 또는 여성이
-   - 위협적
-   - 무능
-   - 희화화된 존재로 고정 표현되어 있는가
-3. 성별 간 대립(남 vs 여), 위계, 갈등 구도가 시각적으로 존재하는가
-4. 온라인 커뮤니티(여혐·남혐 맥락)에서
-   혐오 이미지나 상징으로 소비될 가능성이 있는가
-5. 기업·채용 브랜드 이미지 관점에서
-   논란 또는 오해를 유발할 위험이 있는가
-
----
-
-## 출력 형식 (⚠️ 반드시 이 형식을 유지할 것)
-
-### 검토 결과 요약
-
-- 🔴 **위험 요소**: 있음 / 없음  
-  - (있다면 구체적인 시각 요소 설명)
-
-- 🟡 **오해 소지**: 낮음 / 중간 / 높음  
-
-- 🧩 **문제 유형**  
-  - (예: 성별 일반화 / 젠더 갈등 / 혐오 상징 연상 / 언캐니·조롱 표현 등)
-
-- 🏢 **회사 키비주얼 사용 적합성**  
-  - 적합 / 조건부 가능 / 부적합  
-
-- ✏️ **수정 또는 재생성 권고 사항**  
-  - (실무자가 바로 이해할 수 있도록 구체적으로 제안)
-
----
-
-## 작성 톤 가이드
-- 감정적 표현 사용 금지
-- 특정 집단을 단정하거나 비난하지 말 것
-- "가능성", "오해 소지", "연상될 수 있음"과 같은
-  **리스크 중심 표현**을 사용할 것
-- 회사 내부 검토 문서에 그대로 사용 가능한 톤으로 작성할 것
-  </script>
-
   <header class="header">
     <div class="logo">
       <div class="logo-icon"></div>
-      <span>Figma Make</span>
+      <span>민감 이미지 검토</span>
     </div>
-    <div class="header-actions">
-      <button type="button" class="btn btn-generate" id="btn-generate">
+    <div class="header-actions" style="margin-left: auto; display: flex; gap: 8px;">
+      <button type="button" class="btn btn-generate" id="md-search-btn">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
           <path d="M5 12h14M12 5l7 7-7 7"/>
         </svg>
-        Generate Again
+        Generate
       </button>
-      <button type="button" class="btn btn-approve">
+      <script>
+        // Generate 버튼을 누르면 md파일 부적합 결과값을 보여주게 하는 예시
+        document.getElementById('md-search-btn').addEventListener('click', async function() {
+          const resultBox = document.getElementById('md-search-result');
+          if (!uploadedFile) {
+            resultBox.textContent = "이미지를 우선 업로드 해주세요.";
+            return;
+          }
+          resultBox.textContent = "MD 파일을 검색 중입니다...";
+
+          // 부적합(예: 민감/적합하지 않음) 결과 예시
+          setTimeout(() => {
+            const fakeMdFileName = "example-review.md";
+            const fakeMdContent = "이 이미지는 부적합한 요소가 포함되어 있습니다. 사용이 권장되지 않습니다.\n- 검토자: AI 시스템";
+            // 결과값을 빨간색 강조와 함께 표시
+            resultBox.innerHTML =
+              `<span style="color:#dc2626;font-weight:700">[${fakeMdFileName}] 검색 결과:</span><br><br>` +
+              `<span style="color:#b91c1c;white-space:pre-line">${fakeMdContent}</span>`;
+          }, 1300);
+        });
+      </script>
+      <button type="button" class="btn btn-approve" id="md-approve-btn">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
           <path d="M20 6L9 17l-5-5"/>
         </svg>
-        Approve
+        승인
       </button>
+      <script>
+        document.getElementById('md-approve-btn').addEventListener('click', function() {
+          // 페이지를 처음 상태(새로고침)로 되돌림
+          window.location.href = window.location.pathname;
+        });
+      </script>
     </div>
+    <div id="md-search-result" style="margin-top: 12px; font-size: 15px; color: #2563eb;"></div>
+    <script>
+      // 이미지 업로드와 버튼 상태 참고
+      let uploadedFile = null;
+
+      // detect uploaded image file
+      document.getElementById('image-upload')?.addEventListener('change', function(e) {
+        uploadedFile = e.target.files[0];
+      });
+
+      // md 파일 "검색" 버튼 클릭 시 실행되는 함수
+      document.getElementById('md-search-btn').addEventListener('click', async function() {
+        const resultBox = document.getElementById('md-search-result');
+        if (!uploadedFile) {
+          resultBox.textContent = "이미지를 우선 업로드 해주세요.";
+          return;
+        }
+        resultBox.textContent = "MD 파일을 검색 중입니다...";
+
+        // 실제 검색 로직 대체: (예시) md파일명과 내용 추출
+        // 클라이언트로만 검색이 불가하므로, 데모용 임시 랜덤 텍스트
+        // 실제 환경에서는 서버와 통신하여 md파일을 검색
+        setTimeout(() => {
+          // 가상 결과
+          const fakeMdFileName = "example-review.md";
+          const fakeMdContent = "이 이미지는 부적절한 요소가 없습니다. 사용이 승인되었습니다.\n- 검토자: AI 시스템";
+          resultBox.textContent = `[${fakeMdFileName}] 검색 결과:\n\n${fakeMdContent}`;
+        }, 1300);
+      });
+    </script>
   </header>
 
   <main class="main">
@@ -370,7 +336,7 @@
               <circle cx="8.5" cy="8.5" r="1.5"/>
               <path d="M21 15l-5-5L5 21"/>
             </svg>
-            <span id="upload-text" style="fonr-align: center; margin-top: 8px;" ><u>이미지 첨부하기</u></span>
+            <span id="upload-text" style="font-align: center; margin-top: 8px;" ><u>이미지 첨부하기</u></span>
             <img id="preview-image" src="" alt="미리보기" style="display:none;margin-top:8px;max-width:160px;border-radius:8px;border:1px solid #e5e7eb;" />
           </label>
           <script>
@@ -406,146 +372,77 @@
           </svg>
         </button>
       </div>
-      <div class="review-content" id="review-content">
+      <div class="review-content">
         <p class="review-subtitle">검토 결과 요약</p>
 
-        <div class="review-item" data-field="risk">
+        <div class="review-item">
           <strong>① 위험 요소:</strong>
-          <span class="value">있음 - "남 vs 이 대립 구도, 시료를 가누는 모습"</span>
+          <span class="value">이미지를 업로드하면 AI가 자동으로 검토 결과를 제공합니다.</span>
         </div>
 
-        <div class="review-item" data-field="misunderstanding">
+        <div class="review-item">
           <strong>② 오해 소지:</strong>
-          <span class="value">높음</span>
+          <span class="value">이미지를 첨부해주세요.</span>
         </div>
 
-        <div class="review-item" data-field="problemType">
+        <div class="review-item">
           <strong>문제 유형:</strong>
-          <span class="value">젠더 갈등 / 성별 대립</span>
+          <span class="value">분석 전</span>
         </div>
 
-        <div class="review-item" data-field="fit">
-          <strong>회사 커버주얼 사용 적합성:</strong>
-          <span class="fit-badge">부적합</span>
+        <div class="review-item">
+          <strong>회사 키비주얼 사용 적합성:</strong>
+          <span class="fit-badge">분석 전</span>
         </div>
 
-        <div class="review-item" data-field="recommendation">
+        <div class="review-item">
           <strong>수정 또는 재생성 권고 사항:</strong>
-          <p class="recommendation">남녀 대립 구도를 피하고 중립적, 협력하는 분위기로 수정 권장.</p>
+          <p class="recommendation">AI 분석 결과가 이곳에 표시됩니다.</p>
         </div>
 
-        <div class="warning-box" data-field="warning">
+        <div class="warning-box">
           <svg viewBox="0 0 24 24" fill="currentColor">
             <path d="M12 2L1 21h22L12 2zm0 3.99L19.53 19H4.47L12 5.99zM11 10v4h2v-4h-2zm0 6v2h2v-2h-2z"/>
           </svg>
-          <p><strong>▲ 주의:</strong> 성별 대립 구도로 인해 젠더 갈등을 유발할 위험이 있습니다.</p>
+          <p><strong>▲ 안내:</strong> 이미지를 업로드하면 AI 리뷰 결과가 여기에 표시됩니다.</p>
         </div>
-
-        <p class="criteria-note" id="criteria-note">※ 검토결과요약.md 기준으로 생성됨</p>
       </div>
+      <script>
+        // 검토 결과 케이스 예시 (CASE 01: 성별 대립 구도)
+        const aiResult = {
+          위험요소: "있음 — 남 vs 여 대립 구도가 명확하여 갈등을 직접적으로 유발할 수 있음",
+          오해소지: "높음",
+          문제유형: "젠더 갈등 / 성별 대립",
+          커버적합: "부적합",
+          권고: "성별 간 대치 구도 제거(분할/번개/손가락질/공격 제스처 삭제), 협업/중립 상황으로 재구성(동일 목표, 같은 방향 시선), 인물 대신 추상 아이콘/그래픽으로 대체"
+        };
+
+        // 실제로는 AI 분석 후 콜백으로 실행, 예시로 'DOMContentLoaded' 후 버튼에 이벤트 연결
+        document.addEventListener("DOMContentLoaded", () => {
+          const generateBtn = document.querySelector('.btn-generate');
+          // review 영역 내 각 요소 참조
+          const reviewRoot = document.querySelector('.review-content');
+          const resultMap = {
+            위험요소: reviewRoot.querySelector(".review-item:nth-child(3) .value"),
+            오해소지: reviewRoot.querySelector(".review-item:nth-child(4) .value"),
+            문제유형: reviewRoot.querySelector(".review-item:nth-child(5) .value"),
+            커버적합: reviewRoot.querySelector(".review-item:nth-child(6) .fit-badge"),
+            권고: reviewRoot.querySelector(".recommendation"),
+            안내: reviewRoot.querySelector(".warning-box p")
+          };
+
+          generateBtn && generateBtn.addEventListener('click', () => {
+            resultMap.위험요소.textContent = aiResult.위험요소;
+            resultMap.오해소지.textContent = aiResult.오해소지;
+            resultMap.문제유형.textContent = aiResult.문제유형;
+            resultMap.커버적합.textContent = aiResult.커버적합;
+            resultMap.권고.textContent = aiResult.권고;
+            resultMap.안내.innerHTML = "<strong>▲ 안내:</strong> AI 리뷰 결과가 위에 표시되었습니다.";
+          });
+        });
+      </script>
     </section>
   </main>
-
-  <script>
-    (function() {
-      var promptEl = document.getElementById('review-prompt-md');
-      var btnGenerate = document.getElementById('btn-generate');
-      var reviewContent = document.getElementById('review-content');
-
-      if (!promptEl || !btnGenerate || !reviewContent) return;
-
-      var promptMd = (promptEl.textContent || promptEl.innerText || '').trim();
-
-      // MD 기준 출력 형식에 맞춘 샘플 결과 (실제로는 API/백엔드에서 이미지 분석 후 반환)
-      function getSampleResult() {
-        return {
-          risk: '있음 - "남 vs 이 대립 구도, 시료를 가누는 모습"',
-          misunderstanding: '높음',
-          problemType: '젠더 갈등 / 성별 대립',
-          fit: '부적합',
-          fitClass: 'fit-badge',
-          recommendation: '남녀 대립 구도를 피하고 중립적, 협력하는 분위기로 수정 권장.',
-          warning: '성별 대립 구도로 인해 젠더 갈등을 유발할 위험이 있습니다.'
-        };
-      }
-
-      function showLoading() {
-        var loadingHtml = ''
-          + '<p class="review-subtitle">검토 결과 요약</p>'
-          + '<div class="review-loading">'
-          + '<div class="spinner"></div>'
-          + '<p>검토결과요약.md 기준으로 이미지를 분석 중입니다...</p>'
-          + '</div>';
-        reviewContent.innerHTML = loadingHtml;
-      }
-
-      function showResult(data) {
-        var fitClass = data.fitClass || 'fit-badge';
-        reviewContent.innerHTML = ''
-          + '<p class="review-subtitle">검토 결과 요약</p>'
-          + '<div class="review-item" data-field="risk">'
-          + '<strong>① 위험 요소:</strong> <span class="value">' + escapeHtml(data.risk) + '</span>'
-          + '</div>'
-          + '<div class="review-item" data-field="misunderstanding">'
-          + '<strong>② 오해 소지:</strong> <span class="value">' + escapeHtml(data.misunderstanding) + '</span>'
-          + '</div>'
-          + '<div class="review-item" data-field="problemType">'
-          + '<strong>문제 유형:</strong> <span class="value">' + escapeHtml(data.problemType) + '</span>'
-          + '</div>'
-          + '<div class="review-item" data-field="fit">'
-          + '<strong>회사 커버주얼 사용 적합성:</strong> '
-          + '<span class="' + fitClass + '">' + escapeHtml(data.fit) + '</span>'
-          + '</div>'
-          + '<div class="review-item" data-field="recommendation">'
-          + '<strong>수정 또는 재생성 권고 사항:</strong>'
-          + '<p class="recommendation">' + escapeHtml(data.recommendation) + '</p>'
-          + '</div>'
-          + '<div class="warning-box" data-field="warning">'
-          + '<svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 2L1 21h22L12 2zm0 3.99L19.53 19H4.47L12 5.99zM11 10v4h2v-4h-2zm0 6v2h2v-2h-2z"/></svg>'
-          + '<p><strong>▲ 주의:</strong> ' + escapeHtml(data.warning) + '</p>'
-          + '</div>'
-          + '<p class="criteria-note" id="criteria-note">※ 검토결과요약.md 기준으로 생성됨</p>';
-      }
-
-      function escapeHtml(text) {
-        var div = document.createElement('div');
-        div.textContent = text;
-        return div.innerHTML;
-      }
-
-      function resetUploadArea() {
-        var input = document.getElementById('image-upload');
-        var preview = document.getElementById('preview-image');
-        var text = document.getElementById('upload-text');
-        var icon = document.getElementById('upload-icon');
-        if (input) input.value = '';
-        if (preview) {
-          preview.src = '';
-          preview.style.display = 'none';
-        }
-        if (text) text.innerHTML = '<u>이미지 첨부하기</u>';
-        if (icon) icon.style.display = 'block';
-      }
-
-      btnGenerate.addEventListener('click', function() {
-        if (btnGenerate.disabled) return;
-        if (!promptMd) {
-          alert('검토 기준(prompt)을 불러올 수 없습니다.');
-          return;
-        }
-
-        resetUploadArea();
-        btnGenerate.disabled = true;
-        showLoading();
-
-        // 검토결과요약.md 기준으로 "실행" 시뮬레이션 (실제 환경에서는 업로드 이미지 + API 호출)
-        setTimeout(function() {
-          var result = getSampleResult();
-          showResult(result);
-          btnGenerate.disabled = false;
-        }, 1200);
-      });
-    })();
-  </script>
 </body>
 </html>
+<script>
